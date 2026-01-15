@@ -1,10 +1,7 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { GeneratedAdvice } from "../types";
 
-// User provided API Key fallback
-const apiKey = process.env.API_KEY || 'AIzaSyAgUbQqcNGsvIqHtic02zLQux6-HDIkpqQ';
-
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const adviceSchema: Schema = {
   type: Type.ARRAY,
@@ -22,10 +19,6 @@ const adviceSchema: Schema = {
 };
 
 export const analyzeTranscript = async (url: string, transcriptText?: string): Promise<GeneratedAdvice[]> => {
-  if (!apiKey) {
-    throw new Error("API Key is missing. Please check your environment configuration.");
-  }
-
   // Construct prompt based on available input
   let contentPart = "";
   if (transcriptText && transcriptText.trim()) {
@@ -60,8 +53,7 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
 
   try {
     const response = await ai.models.generateContent({
-      // NOTE: If gemini-3.0-flash fails (404), try changing this to 'gemini-2.0-flash-exp' or 'gemini-1.5-flash'
-      model: 'gemini-3.0-flash', 
+      model: 'gemini-3-flash-preview', 
       contents: prompt,
       config: {
         responseMimeType: "application/json",
