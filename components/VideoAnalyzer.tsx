@@ -8,6 +8,7 @@ const VideoAnalyzer: React.FC = () => {
   const [url, setUrl] = useState('');
   const [transcript, setTranscript] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [extractedAdvice, setExtractedAdvice] = useState<Advice[]>([]);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,12 +41,20 @@ const VideoAnalyzer: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    saveAdvice(extractedAdvice);
-    setSaved(true);
-    setExtractedAdvice([]);
-    setTranscript('');
-    setUrl('');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveAdvice(extractedAdvice);
+      setSaved(true);
+      setExtractedAdvice([]);
+      setTranscript('');
+      setUrl('');
+    } catch (e) {
+      console.error(e);
+      // Even if cloud sync fails, local storage might have worked, but we show error if critical
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -124,9 +133,11 @@ const VideoAnalyzer: React.FC = () => {
             {!saved ? (
               <button
                 onClick={handleSave}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors"
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
               >
-                <Save className="w-4 h-4" /> 知識ベースに保存
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                知識ベースに保存
               </button>
             ) : (
               <span className="flex items-center gap-2 text-emerald-400 font-medium">

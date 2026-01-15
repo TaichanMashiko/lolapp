@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { getAdvice, saveMatch } from '../services/storageService';
 import { Role, GameResult, MatchLog } from '../types';
-import { Target, Trophy, XCircle, ChevronRight, CheckSquare, Square, ClipboardList } from 'lucide-react';
+import { Target, Trophy, XCircle, ChevronRight, CheckSquare, Square, ClipboardList, Loader2 } from 'lucide-react';
 
 // Use the Japanese role values directly
 const ROLES = Object.values(Role).filter(r => r !== Role.All);
 
 const MatchReview: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Step 1 State
   const [selectedRole, setSelectedRole] = useState<Role>(Role.Mid);
@@ -56,7 +57,8 @@ const MatchReview: React.FC = () => {
     setCheckedAdviceIds(next);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    setIsSaving(true);
     const total = relevantAdvice.length;
     const checked = checkedAdviceIds.size;
     const rate = total === 0 ? 0 : Math.round((checked / total) * 100);
@@ -74,14 +76,20 @@ const MatchReview: React.FC = () => {
       checked_advice_ids: Array.from(checkedAdviceIds)
     };
 
-    saveMatch(matchLog);
-    
-    // Reset form
-    setStep(1);
-    setChampion('');
-    setNote('');
-    setCheckedAdviceIds(new Set());
-    alert(`記録完了！ 達成率: ${rate}%`);
+    try {
+      await saveMatch(matchLog);
+      
+      // Reset form
+      setStep(1);
+      setChampion('');
+      setNote('');
+      setCheckedAdviceIds(new Set());
+      alert(`記録完了！ 達成率: ${rate}%`);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -239,9 +247,11 @@ const MatchReview: React.FC = () => {
                   </div>
                   <button
                     onClick={handleFinish}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/50"
+                    disabled={isSaving}
+                    className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/50 disabled:opacity-50"
                   >
-                    <Target className="w-5 h-5" /> 記録して終了
+                     {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Target className="w-5 h-5" />}
+                     記録して終了
                   </button>
                 </div>
               </div>
