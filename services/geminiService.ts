@@ -60,7 +60,8 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.0-flash',
+      // NOTE: If gemini-3.0-flash fails (404), try changing this to 'gemini-2.0-flash-exp' or 'gemini-1.5-flash'
+      model: 'gemini-3.0-flash', 
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -72,7 +73,6 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
 
     const text = response.text;
     
-    // Log grounding metadata for debugging/transparency if needed
     if (response.candidates?.[0]?.groundingMetadata?.groundingChunks) {
       console.log("Grounding Chunks:", response.candidates[0].groundingMetadata.groundingChunks);
     }
@@ -82,7 +82,8 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
     const parsed = JSON.parse(text);
     return parsed as GeneratedAdvice[];
   } catch (error) {
-    console.error("Gemini Analysis Error:", error);
-    throw error;
+    console.error("Gemini Analysis Error Full Object:", error);
+    // Rethrow with a more helpful message if possible
+    throw new Error(`解析エラー: ${error instanceof Error ? error.message : '不明なエラー'}。モデル名やAPIキーを確認してください。`);
   }
 };
