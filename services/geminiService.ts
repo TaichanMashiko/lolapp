@@ -53,7 +53,7 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview', 
+      model: 'gemini-2.0-flash', 
       contents: prompt,
       config: {
         responseMimeType: "application/json",
