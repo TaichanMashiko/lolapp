@@ -1,24 +1,19 @@
 // ==============================================================================
-// ⚠️ SECURITY WARNING:
-// このファイルには秘密鍵が含まれます。
-// 公開リポジトリ（GitHub等）にプッシュすると、スプレッドシートが悪用されるリスクがあります。
-// Vercelなどの環境変数を使用するか、リポジトリをPrivateに設定してください。
+// ⚠️ SECURITY & DEPLOYMENT INSTRUCTION:
+// Vercelにデプロイする際は、Settings > Environment Variables で以下の変数を設定してください。
+// 
+// 1. API_KEY: Gemini APIキー
+// 2. SPREADSHEET_ID: スプレッドシートのID
+// 3. SERVICE_ACCOUNT_EMAIL: サービスアカウントのメールアドレス
+// 4. PRIVATE_KEY: サービスアカウントの秘密鍵 (JSON内の private_key の値すべて)
 // ==============================================================================
 
-// 使用するスプレッドシートのID (URLの /d/xxxxx/edit の xxxxx 部分)
-export const SPREADSHEET_ID = '1A3tjpUcgwqQYn_N7wKR43BdusS3sJ0F272NZ3Ll_KpQ';
+export const SPREADSHEET_ID = process.env.SPREADSHEET_ID || '1A3tjpUcgwqQYn_N7wKR43BdusS3sJ0F272NZ3Ll_KpQ';
 
-// Google Cloud Console からダウンロードしたJSONファイルの中身を転記してください
+export const SERVICE_ACCOUNT_EMAIL = process.env.SERVICE_ACCOUNT_EMAIL || 'lolapp@lolapp-484403.iam.gserviceaccount.com';
 
-// client_email の値を貼り付け
-export const SERVICE_ACCOUNT_EMAIL = 'YOUR_SERVICE_ACCOUNT_EMAIL_HERE';
-
-// private_key の値を貼り付け
-// -----BEGIN PRIVATE KEY----- から -----END PRIVATE KEY----- まで全て含めてください。
-// 改行コード (\n) はそのままで構いません。
-export const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
-YOUR_PRIVATE_KEY_HERE
------END PRIVATE KEY-----`;
+// Handle potential newline escaping issues when reading from env vars (common in Vercel)
+export const PRIVATE_KEY = (process.env.PRIVATE_KEY || '').replace(/\\n/g, '\n');
 
 export const SHEET_NAMES = {
   KNOWLEDGE_BASE: 'Knowledge_Base',

@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { GeneratedAdvice } from "../types";
 
+// Initialize using the environment variable API_KEY injected by Vite/Vercel
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const adviceSchema: Schema = {
@@ -53,7 +54,7 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', 
+      model: 'gemini-3-pro-preview', 
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -75,7 +76,6 @@ export const analyzeTranscript = async (url: string, transcriptText?: string): P
     return parsed as GeneratedAdvice[];
   } catch (error) {
     console.error("Gemini Analysis Error Full Object:", error);
-    // Rethrow with a more helpful message if possible
     throw new Error(`解析エラー: ${error instanceof Error ? error.message : '不明なエラー'}。モデル名やAPIキーを確認してください。`);
   }
 };
