@@ -1,0 +1,5 @@
+{
+  "name": "LoL Mindset Tracker",
+  "description": "A League of Legends improvement application that extracts coaching advice from transcripts using Gemini and tracks your implementation of that advice in matches to correlate discipline with win rates.",
+  "requestFramePermissions": []
+}
